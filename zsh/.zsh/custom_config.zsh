@@ -27,5 +27,5 @@ function ventoy()
 		return 1
 	fi
 
-	sudo /home/h0nzra/Applications/Ventoy/Ventoy2Disk.sh "$1"
+	sudo /home/h0nzra/Applications/Ventoy/Ventoy2Disk.sh -I "$1"
 }
