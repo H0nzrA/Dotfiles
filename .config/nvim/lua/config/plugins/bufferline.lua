@@ -61,7 +61,7 @@ return {
 				},
 				buffer_selected = {
 					bg = '#1e222a',
-					bold = false,
+					bold = true,
 					italic = true,
 				},
 				buffer_visible = {
