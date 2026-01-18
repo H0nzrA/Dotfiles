@@ -16,17 +16,8 @@ git clone https://github.com/H0nzrA/Dotfiles.git
 cd Dotfiles
 ```
 
-### Install `Stow`
+### Install with the shell script
 
 ```bash
-sudo apt install stow
-# or
-sudo snap install stow
-
+    ./install.sh
 ```
-
-### Configuration
-```bash
-stow .
-```
-
