@@ -39,15 +39,36 @@ function	print_log()
 
 function	copy_config()
 {
+	local is_kitty=0
+	local is_nvim=0
+
+	# ===== Neovim section =====
 	if [[ -e "$HOME/.config/nvim" ]]; then
-		print_log "Neovim file already exist, abort copy" "y"
-		return 1
+		print_log "Neovim config already exist, abort copy" "y"
+		is_nvim=1
 	fi
 
-	if cp -r "$s_config_path/nvim" "$HOME/.config/"; then
-		print_log "-> Neovim config copied successfully" "g"
-	else
-		print_log "-> Failed to copy Neovim confi" "r"
+	# ===== Kitty section =====
+	if [[ -e "$HOME/.config/kitty" ]]; then
+		print_log "Kitty config already exist, abort copy" "y"
+		is_kitty=1
+	fi
+
+	# =============================
+	if [[ "$is_nvim" -eq 0 ]]; then
+		if cp -r "$s_config_path/nvim" "$HOME/.config/"; then
+			print_log "-> Neovim config copied successfully" "g"
+		else
+			print_log "-> Failed to copy Neovim config" "r"
+		fi
+	fi
+
+	if [[ "$is_kitty" -eq 0 ]];then
+		if cp -r "$s_config_path/kitty" "$HOME/.config/"; then
+			print_log "-> Kitty config copied successfully" "g"
+		else
+			print_log "-> Failed to copy Kitty config" "r"
+		fi
 	fi
 }
 
