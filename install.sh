@@ -1,36 +1,100 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+
+
+s_path=$(pwd)
+s_config_path="$s_path/config"
+s_zsh_path="$s_path/zsh"
 
 # Color section
+c_reset="\033[0m"
 c_red="\033[31m"
 c_green="\033[32m"
 c_yellow="\033[33m"
-c_blue="\033[34m"
-c_magenta="\033[35m"
-c_cyan="\033[36m"
-c_reset="\033[0m"
 
-# Path section
-s_path=$(pwd)
-s_lib_path="$s_path/lib"
-s_nvim_path="$s_path/nvim"
-s_zsh_path="$s_path/zsh"
 
-# Lib section .sh file
-lib_check_d="$s_lib_path/check_dependencies.sh"
-
-f_backup="$HOME/.backup"
-
-function	check_dependencies()
+function	print_log()
 {
-	"$lib_check_d"
+	local color="$c_green"
+
+	if [[ -z "$1" ]]; then
+		echo -e "No logs add"
+		return 1
+	fi
+
+	color_val=${2,,}
+	if [[ "$color_val" == "r" ]]; then
+		color="$c_red"
+	elif [[ "$color_val" == "y" ]]; then
+		color="$c_yellow"
+	else
+		color="$c_green"
+	fi
+
+	echo -e "${color}"
+	echo -e "$1"
+	echo -e "${c_reset}"
+	return 0
+}
+
+function	copy_config()
+{
+	if [[ -e "$HOME/.config/nvim" ]]; then
+		print_log "Neovim file already exist, abort copy" "y"
+		return 1
+	fi
+
+	if cp -r "$s_config_path/nvim" "$HOME/.config/"; then
+		print_log "-> Neovim config copied successfully" "g"
+	else
+		print_log "-> Failed to copy Neovim confi" "r"
+	fi
+}
+
+function	copy_zsh()
+{
+	local folder_zsh=0
+	local file_zsh=0
+
+	if [[ -d "$HOME/.zsh" ]]; then
+		folder_zsh=1
+		print_log ".zsh folder already exist" "y"
+	fi
+	
+	if [[ -f "$HOME/.zshrc" ]]; then
+		file_zsh=1
+		print_log ".zshrc file already exist" "y"
+	fi
+
+	if [[ "$folder_zsh" -eq 0 ]]; then
+		if cp -r "$s_zsh_path/.zsh" "$HOME/.zsh"; then
+			print_log "-> ZSH plugins copied successfully" "g"
+		else
+			print_log "-> Failed to copy zsh plugins" "r"
+		fi
+	fi
+
+	if [[ "$file_zsh" -eq 0 ]]; then
+		if cp "$s_zsh_path/.zshrc" "$HOME/"; then
+			print_log "-> .zshrc copied successfully" "g"
+		else
+			print_log "-> Failed to copy .zshrc file" "r"
+		fi
+	fi
+}
+
+function	copy_file()
+{
+	copy_config
+	copy_zsh
 }
 
 
 function	run()
 {
-	echo -e "${c_green}>>>>>>>>>>	Installing Dotfiles	<<<<<<<<<<${c_reset}"
+	print_log ">>>>>>>>>>	Installation of Dotfiles	<<<<<<<<<<"
 
-	check_dependencies
+	copy_file
 }
 
 run

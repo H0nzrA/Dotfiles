@@ -1,6 +1,3 @@
-# ===== File: home/zsh/kitty.zsh =====
-# Kitty Terminal Enhancements (without Starship)
-
 # Add local bin to PATH
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -12,16 +9,6 @@ if command -v eza &> /dev/null; then
     alias lt='eza --icons --group-directories-first --tree'
     alias lsa='eza --icons --group-directories-first -lah'
 fi
-
-# bat - SAFE: 99% compatible with cat, adds syntax highlighting
-if command -v bat &> /dev/null; then
-    alias cat='bat --style=auto'
-    export BAT_THEME="Catppuccin Mocha"
-fi
-
-# fd and ripgrep - NOT aliased (different syntax)
-# Use 'fd' instead of 'find' when you want speed
-# Use 'rg' instead of 'grep' when you want speed
 
 # zoxide - SAFE: keeps 'cd' working, adds 'z' for smart jumping
 if command -v zoxide &> /dev/null; then
