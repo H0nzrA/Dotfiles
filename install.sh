@@ -110,12 +110,24 @@ function	copy_file()
 	copy_zsh
 }
 
+function	configuration_kitty()
+{
+	print_log ". Do you want to make kitty the default terminal usage? (y/n)" "y"
+	read -rp "Enter choice: " choice
+
+	choice=${choice,,}
+	if [[ $choice == "y" || $choice == "yes" ]]; then
+		sudo update-alternatives --config x-terminal-emulator
+	fi
+}
+
 
 function	run()
 {
 	print_log ">>>>>>>>>>	Installation of Dotfiles	<<<<<<<<<<"
 
 	copy_file
+	configuration_kitty
 }
 
 run
