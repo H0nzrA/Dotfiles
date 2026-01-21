@@ -23,7 +23,7 @@ return {
 		-- LSP servers YOU actually need
 		mason_lspconfig.setup({
 			ensure_installed = {
-				-- "clangd",  -- C / C++
+				"clangd",  -- C / C++
 				"pyright", -- Python
 				"bashls",  -- Shell
 				"lua_ls",  -- Neovim config
