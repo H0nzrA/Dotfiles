@@ -6,7 +6,7 @@ if vim.fn.filereadable(stdheader_path) == 1 then
   vim.cmd("source " .. stdheader_path)
   
   vim.g.user42 = "trakotoz"  -- 42 login
-  vim.g.mail42 = "trakotoz@student.42.mg"  -- 42 email
+  vim.g.mail42 = "trakotoz@student.42antananarivo.mg"  -- 42 email
   
   -- Additional keybindings (optional, F1 already works from the vim file)
   vim.keymap.set("n", "<leader>h", ":Stdheader<CR>", { 
