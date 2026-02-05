@@ -1,11 +1,40 @@
 -- lua/config/plugins/norminette.lua
 
--- This is NOT a lazy.nvim plugin spec, just a simple config file
--- that will be loaded by your plugins/init.lua
+-- This configuration adds Ctrl+S to format files with c_formatter_42
+-- and keeps norminette checking functionality
 
 local M = {}
 
--- Function to run norminette on current file
+-- Function to format current file with c_formatter_42
+M.format_file = function()
+  local file = vim.fn.expand('%:p')
+  
+  -- Check if file exists
+  if vim.fn.filereadable(file) == 0 then
+    vim.notify("No file to format", vim.log.levels.WARN)
+    return
+  end
+  
+  -- Save file before formatting
+  vim.cmd('write')
+  
+  -- Run c_formatter_42 in-place
+  local cmd = 'c_formatter_42 ' .. vim.fn.shellescape(file)
+  local output = vim.fn.system(cmd)
+  local exit_code = vim.v.shell_error
+  
+  -- Reload the file to show formatted version
+  vim.cmd('edit!')
+  
+  -- Notify result
+  if exit_code == 0 then
+    vim.notify("✓ File formatted with c_formatter_42", vim.log.levels.INFO)
+  else
+    vim.notify("✗ Formatting failed: " .. output, vim.log.levels.ERROR)
+  end
+end
+
+-- Function to run norminette on current file (checking)
 M.run_norminette = function()
   local file = vim.fn.expand('%:p')
   
@@ -104,8 +133,15 @@ M.run_norminette_dir = function()
   end
 end
 
--- Ctrl+S to run norminette on current file
-vim.keymap.set('n', '<C-s>', M.run_norminette, { 
+-- KEY BINDINGS
+-- Ctrl+S to format current file with c_formatter_42
+vim.keymap.set('n', '<C-s>', M.format_file, { 
+  desc = 'Format file with c_formatter_42',
+  silent = true 
+})
+
+-- Leader+n to run norminette on current file
+vim.keymap.set('n', '<leader>n', M.run_norminette, { 
   desc = 'Run Norminette on current file',
   silent = true 
 })
@@ -117,14 +153,15 @@ vim.keymap.set('n', '<leader>N', M.run_norminette_dir, {
 })
 
 -- Create commands
+vim.api.nvim_create_user_command('Format42', M.format_file, {})
 vim.api.nvim_create_user_command('Norminette', M.run_norminette, {})
 vim.api.nvim_create_user_command('NorminetteDir', M.run_norminette_dir, {})
 
--- Notify on load (non-blocking)
+-- Notify on load
 vim.defer_fn(function()
-  vim.notify("✓ Norminette keybindings loaded (Ctrl+S)", vim.log.levels.INFO, {
-    title = "Norminette",
-    timeout = 2000,
+  vim.notify("✓ 42 Tools loaded:\n  Ctrl+S: Format\n  <leader>n: Check file\n  <leader>N: Check dir", vim.log.levels.INFO, {
+    title = "42 Norminette",
+    timeout = 3000,
   })
 end, 100)
 
