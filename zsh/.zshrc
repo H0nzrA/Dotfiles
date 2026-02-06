@@ -10,7 +10,6 @@ fi
 
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_CUSTOM="$HOME/.zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
@@ -114,14 +113,18 @@ source $ZSH/oh-my-zsh.sh
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+ZSH_COMPDUMP=$HOME/.zcompdump
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # ===== Configuration ===== 
+ZSH_CUSTOM="$HOME/.zsh"
 
 # Source all .zsh files in that folder
 for f in "$ZSH_CUSTOM"/*.zsh; do
     [[ -f "$f" ]] && source "$f"
 done
+export PATH="$HOME/Applications/Neovim:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
