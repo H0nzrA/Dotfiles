@@ -366,6 +366,13 @@ configure_kitty_default() {
     fi
 }
 
+function	install_C_formatter()
+{
+	local python_cmd="python"
+	print_log "Installing C_fomratter_42"
+	python -m pip install --user c_formatter_42
+}
+
 # ============================================================================
 # Main Installation Process
 # ============================================================================
@@ -401,6 +408,7 @@ main() {
     install_zsh_config
     install_zsh_plugins
     configure_kitty_default
+
     
     # Final message
     print_log "\n╔════════════════════════════════════════════════════════════╗" "b"
