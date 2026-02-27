@@ -1,42 +1,38 @@
+-- plugins/colorscheme.lua
+-- Loads both theme plugins; the active one is chosen by theme_switcher
+
 return {
-	"folke/tokyonight.nvim",
-	priority = 1000,
-	config = function()
-		-- Colors personalization
-		local transparent = true
+	-- Kanagawa
+	{
+		"rebelot/kanagawa.nvim",
+		lazy = true,
+	},
+	-- Tokyonight
+	{
+		"folke/tokyonight.nvim",
+		lazy = true,
+	},
+	-- Loader: picks up saved theme on startup and registers the toggle command
+	{
+		"nvim-lua/plenary.nvim", -- already a dependency you have, just piggybacks
+		priority = 1000,
+		config = function()
+			local switcher = require("theme_switcher")
 
-		local bg = "#011628"
-		local bg_dark = "#011423"
-		local bg_highlight = "#143652"
-		local bg_search = "#0A64AC"
-		local bg_visual = "#275378"
-		local fg = "#CBE0F0"
-		local fg_dark = "#B4D0E9"
-		local fg_gutter = "#627E97"
-		local border = "#547998"
+			-- Apply whichever theme was last saved (or default: kanagawa)
+			switcher.apply(switcher.get_saved())
 
-		require("tokyonight").setup({
-			style = "night",
-			transparent = transparent,
-			on_colors = function(colors)
-				colors.bg = bg
-				colors.bg_dark = transparent and colors.none or bg_dark
-				colors.bg_float = transparent and colors.none or bg_dark
-				colors.bg_highlight = bg_highlight
-				colors.bg_popup = bg_dark
-				colors.bg_search = bg_search
-				colors.bg_sidebar = transparent and colors.none or bg_dark
-				colors.bg_statusline = transparent and colors.none or bg_dark
-				colors.bg_visual = bg_visual
-				colors.border = border
-				colors.fg = fg
-				colors.fg_dark = fg_dark
-				colors.fg_float = fg
-				colors.fg_gutter = fg_gutter
-				colors.fg_sidebar = fg_dark
-			end
-		})
+			-- :ThemeToggle  → swap between the two
+			vim.api.nvim_create_user_command("ThemeToggle", function()
+				switcher.toggle()
+			end, { desc = "Toggle between Kanagawa and Tokyonight" })
 
-		vim.cmd("colorscheme tokyonight")
-	end
+			-- Optional keybind: <leader>tt
+			vim.keymap.set("n", "<leader>tt", "<cmd>ThemeToggle<CR>", {
+				noremap = true,
+				silent = true,
+				desc = "Toggle theme",
+			})
+		end,
+	},
 }
