@@ -3,14 +3,14 @@ return {
 	event = "VeryLazy",
 	init = function()
 		vim.o.timeout = true
-		vim.o.timeoutlen = 300
+		vim.o.timeoutlen = 800
 	end,
 	config = function()
 		local wk = require("which-key")
 
 		wk.setup({
 			preset = "modern",
-			delay = 200,
+			delay = 600,
 			plugins = {
 				marks = true,
 				registers = true,

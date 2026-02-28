@@ -366,11 +366,123 @@ configure_kitty_default() {
     fi
 }
 
-function	install_C_formatter()
-{
-	local python_cmd="python"
-	print_log "Installing C_fomratter_42"
-	python -m pip install --user c_formatter_42
+# ============================================================================
+# [ADDED] Neovim Tools Check & Install
+# Checks for: c_formatter_42, norminette, flake8, autopep8
+# Each tool is checked independently — missing ones prompt for install
+# ============================================================================
+install_neovim_tools() {
+    print_log "\n[Neovim Tools — C & Python Formatters]" "b"
+
+    # Helper: try to find a working pip command
+    local pip_cmd=""
+    for cmd in pip3 pip python3 -m pip python -m pip; do
+        if command -v ${cmd%% *} &> /dev/null; then
+            pip_cmd="$cmd"
+            break
+        fi
+    done
+
+    if [[ -z "$pip_cmd" ]]; then
+        print_log "  ✗ No pip found. Please install pip first." "r"
+        print_log "  ⊘ Skipping all tool installations" "y"
+        return 1
+    fi
+
+    print_log "  ℹ Using: $pip_cmd" "y"
+
+    # ------------------------------------------------------------------
+    # c_formatter_42
+    # ------------------------------------------------------------------
+    if command -v c_formatter_42 &> /dev/null; then
+        print_log "  ✓ c_formatter_42 already installed" "g"
+    else
+        print_log "  ⚠ c_formatter_42 not found" "y"
+        read -rp "  Do you want to install c_formatter_42? (y/n): " choice
+        choice=${choice,,}
+        if [[ "$choice" == "y" || "$choice" == "yes" ]]; then
+            print_log "  → Installing c_formatter_42..." "b"
+            if $pip_cmd install --user c_formatter_42; then
+                print_log "  ✓ c_formatter_42 installed successfully" "g"
+            else
+                print_log "  ✗ Failed to install c_formatter_42" "r"
+            fi
+        else
+            print_log "  ⊘ Skipping c_formatter_42" "y"
+        fi
+    fi
+
+    # ------------------------------------------------------------------
+    # norminette
+    # ------------------------------------------------------------------
+    if command -v norminette &> /dev/null; then
+        print_log "  ✓ norminette already installed" "g"
+    else
+        print_log "  ⚠ norminette not found" "y"
+        read -rp "  Do you want to install norminette? (y/n): " choice
+        choice=${choice,,}
+        if [[ "$choice" == "y" || "$choice" == "yes" ]]; then
+            print_log "  → Installing norminette..." "b"
+            if $pip_cmd install --user norminette; then
+                print_log "  ✓ norminette installed successfully" "g"
+            else
+                print_log "  ✗ Failed to install norminette" "r"
+            fi
+        else
+            print_log "  ⊘ Skipping norminette" "y"
+        fi
+    fi
+
+    # ------------------------------------------------------------------
+    # flake8
+    # ------------------------------------------------------------------
+    if command -v flake8 &> /dev/null; then
+        print_log "  ✓ flake8 already installed" "g"
+    else
+        print_log "  ⚠ flake8 not found" "y"
+        read -rp "  Do you want to install flake8? (y/n): " choice
+        choice=${choice,,}
+        if [[ "$choice" == "y" || "$choice" == "yes" ]]; then
+            print_log "  → Installing flake8..." "b"
+            if $pip_cmd install --user flake8; then
+                print_log "  ✓ flake8 installed successfully" "g"
+            else
+                print_log "  ✗ Failed to install flake8" "r"
+            fi
+        else
+            print_log "  ⊘ Skipping flake8" "y"
+        fi
+    fi
+
+    # ------------------------------------------------------------------
+    # autopep8
+    # ------------------------------------------------------------------
+    if command -v autopep8 &> /dev/null; then
+        print_log "  ✓ autopep8 already installed" "g"
+    else
+        print_log "  ⚠ autopep8 not found" "y"
+        read -rp "  Do you want to install autopep8? (y/n): " choice
+        choice=${choice,,}
+        if [[ "$choice" == "y" || "$choice" == "yes" ]]; then
+            print_log "  → Installing autopep8..." "b"
+            if $pip_cmd install --user autopep8; then
+                print_log "  ✓ autopep8 installed successfully" "g"
+            else
+                print_log "  ✗ Failed to install autopep8" "r"
+            fi
+        else
+            print_log "  ⊘ Skipping autopep8" "y"
+        fi
+    fi
+
+    # Warn if ~/.local/bin is not in PATH (common issue with --user installs)
+    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+        print_log "\n  ⚠ ~/.local/bin is not in your PATH" "y"
+        print_log "  ℹ Add this to your .zshrc or .bashrc:" "y"
+        print_log '    export PATH="$HOME/.local/bin:$PATH"' "y"
+    fi
+
+    return 0
 }
 
 # ============================================================================
@@ -408,11 +520,12 @@ main() {
     install_zsh_config
     install_zsh_plugins
     configure_kitty_default
+    install_neovim_tools  # [ADDED]
 
     
     # Final message
     print_log "\n╔════════════════════════════════════════════════════════════╗" "b"
-    print_log "║          Installation Complete!                           ║" "b"
+    print_log "║           Installation Complete!                           ║" "b"
     print_log "╚════════════════════════════════════════════════════════════╝" "b"
     print_log "\n📋 Next Steps:" "b"
     print_log "  1. Restart your terminal or run: source ~/.zshrc" "y"

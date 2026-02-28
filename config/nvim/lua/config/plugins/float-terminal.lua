@@ -1,6 +1,6 @@
 -- plugins/float-terminal.lua
 return {
-  "akinsho/toggleterm.nvim", -- dummy plugin dependency, can be empty string ""
+  "akinsho/toggleterm.nvim",
   config = function()
     -- Escape terminal mode with double escape
     vim.keymap.set("t", "<esc><esc>", "<c-\\><c-n>")
@@ -26,7 +26,7 @@ local function create_floating_window(opts)
   if vim.api.nvim_buf_is_valid(opts.buf) then
     buf = opts.buf
   else
-    buf = vim.api.nvim_create_buf(false, true) -- No file, scratch buffer
+    buf = vim.api.nvim_create_buf(false, true)
   end
 
   -- Define window configuration
@@ -52,7 +52,6 @@ local open_terminal = function()
     if vim.bo[state.floating.buf].buftype ~= "terminal" then
       vim.cmd.terminal()
     end
-    -- Enter insert mode automatically when opening terminal
     vim.cmd.startinsert()
   end
 end
@@ -63,19 +62,22 @@ local close_terminal = function()
   end
 end
 
+-- [ADDED] Single toggle function: opens if closed, closes if open
+-- Replaces the two separate open/close keymaps below
+local toggle_terminal = function()
+  if vim.api.nvim_win_is_valid(state.floating.win) then
+    close_terminal()
+  else
+    open_terminal()
+  end
+end
+
 -- Create user command
 vim.api.nvim_create_user_command("Floaterminal", open_terminal, {})
 
--- <leader>` to OPEN terminal
-vim.keymap.set({ "n", "t" }, "<leader>`", open_terminal, {
-  desc = "Open floating terminal",
-  noremap = true,
-  silent = true,
-})
-
--- <leader>' to CLOSE terminal
-vim.keymap.set({ "n", "t" }, "<leader>'", close_terminal, {
-  desc = "Close floating terminal",
+-- Single <C-`> toggle works in both normal and terminal mode safely
+vim.keymap.set({ "n", "t" }, "<C-`>", toggle_terminal, {
+  desc = "Toggle floating terminal",
   noremap = true,
   silent = true,
 })
