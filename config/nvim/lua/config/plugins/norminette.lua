@@ -135,10 +135,10 @@ end
 
 -- KEY BINDINGS
 -- Ctrl+S to format current file with c_formatter_42
-vim.keymap.set('n', '<C-s>', M.format_file, { 
-  desc = 'Format file with c_formatter_42',
-  silent = true 
-})
+-- vim.keymap.set('n', '<C-s>', M.format_file, { 
+--   desc = 'Format file with c_formatter_42',
+--   silent = true 
+-- })
 
 -- Leader+n to run norminette on current file
 vim.keymap.set('n', '<leader>n', M.run_norminette, { 
@@ -157,13 +157,7 @@ vim.api.nvim_create_user_command('Format42', M.format_file, {})
 vim.api.nvim_create_user_command('Norminette', M.run_norminette, {})
 vim.api.nvim_create_user_command('NorminetteDir', M.run_norminette_dir, {})
 
--- Notify on load
-vim.defer_fn(function()
-  vim.notify("✓ 42 Tools loaded:\n  Ctrl+S: Format\n  <leader>n: Check file\n  <leader>N: Check dir", vim.log.levels.INFO, {
-    title = "42 Norminette",
-    timeout = 3000,
-  })
-end, 100)
 
--- Return empty table (required for lazy.nvim compatibility)
+_G._42tools = _G._42tools or {}
+_G._42tools.norminette = M
 return {}
