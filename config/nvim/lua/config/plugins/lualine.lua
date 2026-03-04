@@ -176,62 +176,67 @@ return {
 		-- ── Setup ─────────────────────────────────────────────────────────────
 		lualine.setup({
 			options = {
-				theme                = theme,
-				icons_enabled        = true,
-				section_separators   = { left = "", right = "" },
-				component_separators = { left = "│", right = "│" },
-				globalstatus         = true,
+				theme = theme,
+				icons_enabled = true,
+				section_separators = { left = '', right = '' },
+				component_separators = { left = '', right = '' },
 				always_divide_middle = true,
+				globalstatus = true,
 			},
 
 			sections = {
 				lualine_a = {
-					{ mode_label, separator = { left = "" }, padding = { left = 1, right = 1 } },
-				},
-				lualine_b = { branch, diff },
-				lualine_c = {
 					{
-						"filename",
-						path = 1,  -- relative path
-						symbols = { modified = "  ", readonly = "  ", unnamed = "  " },
-						color = { fg = colors.fg },
-					},
-				},
-				lualine_x = {
-					lazy_updates,
-					diagnostics,
-					lsp_name,
-					filetype,
-					encoding,
-					fileformat,
-				},
-				lualine_y = { progress },
-				lualine_z = {
-					location,
-					{
-						function()
-							local bars = { "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█" }
-							local pct  = vim.fn.line(".") / vim.fn.line("$")
-							return bars[math.ceil(pct * #bars)] or bars[1]
+						'mode',
+						fmt = function(str)
+							return "󰄛 " .. str
 						end,
-						color   = { fg = colors.blue, bg = colors.surface1 },
-						padding = { left = 0, right = 1 },
+					},
+				},
+
+				lualine_b = {
+					{
+						'branch',
+						icon = '',
+					},
+				},
+
+				lualine_c = {
+					{
+						'filename',
+						path = 1,
+						symbols = {
+							modified = ' ●',
+							readonly = ' ',
+							unnamed = '[No Name]',
+						},
+					},
+				},
+
+				lualine_x = {
+					diagnostics,
+					{
+						lazy_status.updates,
+						cond = lazy_status.has_updates,
+						icon = "󰒲 ",
+						color = { fg = "#ff9e64" },
+					},
+					{ "encoding", icon = "󰈙 " },
+					{ "fileformat", icon = "󰌽 " },
+					{ "filetype", icon_only = false },
+				},
+
+				lualine_y = {
+					{ "progress", icon = "󰊕 " },
+				},
+
+				lualine_z = {
+					{
+						"location",
+						icon = "󰍒 ",
 					},
 				},
 			},
-
-			inactive_sections = {
-				lualine_a = {},
-				lualine_b = {},
-				lualine_c = {
-					{ "filename", path = 1, color = { fg = colors.overlay } },
-				},
-				lualine_x = { { "filetype", colored = false, color = { fg = colors.overlay } } },
-				lualine_y = {},
-				lualine_z = {},
-			},
-
-			extensions = { "neo-tree", "lazy", "mason", "trouble", "quickfix" },
 		})
 	end,
 }
