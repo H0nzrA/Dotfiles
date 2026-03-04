@@ -1,94 +1,237 @@
 return {
 	"nvim-lualine/lualine.nvim",
 	dependencies = { "nvim-tree/nvim-web-devicons" },
-
 	config = function()
 		local lualine = require("lualine")
 		local lazy_status = require("lazy.status")
 
-		-- Your original color scheme with Catppuccin Mocha touches
+		-- Catppuccin Mocha palette
 		local colors = {
-			blue = "#89B4FA",      -- Catppuccin blue
-			green = "#A6E3A1",     -- Catppuccin green
-			violet = "#CBA6F7",    -- Catppuccin mauve
-			yellow = "#F9E2AF",    -- Catppuccin yellow
-			red = "#F38BA8",       -- Catppuccin red
-			fg = "#CDD6F4",        -- Catppuccin text
-			bg = "#1E1E2E",        -- Catppuccin base (slightly visible for contrast)
-			inactive_bg = "#181825", -- Catppuccin mantle
+			blue      = "#89B4FA",
+			green     = "#A6E3A1",
+			violet    = "#CBA6F7",
+			yellow    = "#F9E2AF",
+			red       = "#F38BA8",
+			peach     = "#FAB387",
+			teal      = "#94E2D5",
+			sky       = "#89DCEB",
+			fg        = "#CDD6F4",
+			subtext   = "#A6ADC8",
+			overlay   = "#6C7086",
+			surface1  = "#313244",
+			surface0  = "#1E1E2E",
+			bg        = "#1E1E2E",
+			mantle    = "#181825",
+			crust     = "#11111B",
 		}
 
-		-- Your original theme structure with Catppuccin colors
-		local perso_lualine_theme = {
+		local theme = {
 			normal = {
-				a = { bg = colors.blue, fg = colors.bg, gui = "bold" },
-				b = { bg = colors.bg, fg = colors.fg },
-				c = { bg = colors.bg, fg = colors.fg },
+				a = { bg = colors.blue,   fg = colors.crust, gui = "bold" },
+				b = { bg = colors.surface1, fg = colors.fg },
+				c = { bg = colors.mantle,  fg = colors.subtext },
 			},
 			insert = {
-				a = { bg = colors.green, fg = colors.bg, gui = "bold" },
-				b = { bg = colors.bg, fg = colors.fg },
-				c = { bg = colors.bg, fg = colors.fg },
+				a = { bg = colors.green,  fg = colors.crust, gui = "bold" },
+				b = { bg = colors.surface1, fg = colors.fg },
+				c = { bg = colors.mantle,  fg = colors.subtext },
 			},
 			visual = {
-				a = { bg = colors.violet, fg = colors.bg, gui = "bold" },
-				b = { bg = colors.bg, fg = colors.fg },
-				c = { bg = colors.bg, fg = colors.fg },
+				a = { bg = colors.violet, fg = colors.crust, gui = "bold" },
+				b = { bg = colors.surface1, fg = colors.fg },
+				c = { bg = colors.mantle,  fg = colors.subtext },
 			},
 			command = {
-				a = { bg = colors.yellow, fg = colors.bg, gui = "bold" },
-				b = { bg = colors.bg, fg = colors.fg },
-				c = { bg = colors.bg, fg = colors.fg },
+				a = { bg = colors.yellow, fg = colors.crust, gui = "bold" },
+				b = { bg = colors.surface1, fg = colors.fg },
+				c = { bg = colors.mantle,  fg = colors.subtext },
 			},
 			replace = {
-				a = { bg = colors.red, fg = colors.bg, gui = "bold" },
-				b = { bg = colors.bg, fg = colors.fg },
-				c = { bg = colors.bg, fg = colors.fg },
+				a = { bg = colors.red,    fg = colors.crust, gui = "bold" },
+				b = { bg = colors.surface1, fg = colors.fg },
+				c = { bg = colors.mantle,  fg = colors.subtext },
 			},
 			inactive = {
-				a = { bg = colors.inactive_bg, fg = colors.fg, gui = "bold" },
-				b = { bg = colors.inactive_bg, fg = colors.fg },
-				c = { bg = colors.inactive_bg, fg = colors.fg },
+				a = { bg = colors.mantle, fg = colors.overlay, gui = "bold" },
+				b = { bg = colors.mantle, fg = colors.overlay },
+				c = { bg = colors.mantle, fg = colors.overlay },
 			},
 		}
 
-		local hide_in_width = function()
-			return vim.fn.winwidth(0) > 100
+		-- ── Helpers ────────────────────────────────────────────────────────────
+		local function wide() return vim.fn.winwidth(0) > 100 end
+		local function medium() return vim.fn.winwidth(0) > 70 end
+
+		-- ── Mode icon map ──────────────────────────────────────────────────────
+		local mode_icons = {
+			n  = "󰋜 NOR", i  = "󰏫 INS", v  = "󰩭 VIS",
+			V  = "󰩭 V·L", ["\22"] = "󰩭 V·B",
+			c  = "󰞷 CMD", R  = "󰑎 REP", s  = "󰒅 SEL",
+			S  = "󰒅 S·L", t  = "󰆍 TER",
+		}
+		local function mode_label()
+			local m = vim.fn.mode()
+			return mode_icons[m] or ("󰋜 " .. m:upper())
 		end
 
-		local diagnostics = {
-			'diagnostics',
-			sources = { 'nvim_diagnostic' },
-			sections = { 'error', 'warn' },
-			symbols = { error = ' ', warn = ' ', info = ' ', hint = ' ' },
-			colored = false,
-			update_in_insert = false,
-			always_visible = false,
-			cond = hide_in_width,
+		-- ── Git branch with icon ───────────────────────────────────────────────
+		local branch = {
+			"branch",
+			icon = "",
+			color = { fg = colors.violet, gui = "bold" },
+			cond = medium,
 		}
 
-		-- Configure lualine - keeping your original simple structure
+		-- ── Git diff ──────────────────────────────────────────────────────────
+		local diff = {
+			"diff",
+			symbols = { added = " ", modified = " ", removed = " " },
+			diff_color = {
+				added    = { fg = colors.green },
+				modified = { fg = colors.yellow },
+				removed  = { fg = colors.red },
+			},
+			cond = wide,
+		}
+
+		-- ── Diagnostics ───────────────────────────────────────────────────────
+		local diagnostics = {
+			"diagnostics",
+			sources = { "nvim_diagnostic" },
+			sections = { "error", "warn", "info", "hint" },
+			symbols = { error = " ", warn = " ", info = " ", hint = "󰌶 " },
+			diagnostics_color = {
+				error = { fg = colors.red },
+				warn  = { fg = colors.yellow },
+				info  = { fg = colors.sky },
+				hint  = { fg = colors.teal },
+			},
+			colored = true,
+			update_in_insert = false,
+			always_visible = false,
+			cond = wide,
+		}
+
+		-- ── LSP server name ───────────────────────────────────────────────────
+		local lsp_name = {
+			function()
+				local clients = vim.lsp.get_active_clients({ bufnr = 0 })
+				if #clients == 0 then return "󰅚 no lsp" end
+				local names = {}
+				for _, c in ipairs(clients) do
+					if c.name ~= "null-ls" and c.name ~= "copilot" then
+						table.insert(names, c.name)
+					end
+				end
+				return #names > 0 and ("󰒍 " .. table.concat(names, ", ")) or "󰅚 no lsp"
+			end,
+			color = { fg = colors.teal },
+			cond = wide,
+		}
+
+		-- ── Lazy updates ──────────────────────────────────────────────────────
+		local lazy_updates = {
+			lazy_status.updates,
+			cond = function() return wide() and lazy_status.has_updates() end,
+			color = { fg = colors.peach },
+		}
+
+		-- ── File info ─────────────────────────────────────────────────────────
+		local filetype = {
+			"filetype",
+			colored = true,
+			icon_only = false,
+			color = { fg = colors.fg },
+		}
+
+		local fileformat = {
+			"fileformat",
+			symbols = { unix = " lf", dos = " crlf", mac = " cr" },
+			color = { fg = colors.overlay },
+			cond = wide,
+		}
+
+		local encoding = {
+			"encoding",
+			color = { fg = colors.overlay },
+			cond = wide,
+		}
+
+		-- ── Progress / location ───────────────────────────────────────────────
+		local progress = {
+			"progress",
+			color = { fg = colors.subtext },
+		}
+
+		local location = {
+			function()
+				local line = vim.fn.line(".")
+				local col  = vim.fn.virtcol(".")
+				local tot  = vim.fn.line("$")
+				return string.format("󰍒 %d:%d  %d", line, col, tot)
+			end,
+			color = { fg = colors.subtext },
+		}
+
+		-- ── Setup ─────────────────────────────────────────────────────────────
 		lualine.setup({
 			options = {
-				theme = perso_lualine_theme,
-				icons_enabled = true,
-				--          
-				section_separators = { left = '' , right = ""},
+				theme                = theme,
+				icons_enabled        = true,
+				section_separators   = { left = "", right = "" },
+				component_separators = { left = "│", right = "│" },
+				globalstatus         = true,
 				always_divide_middle = true,
 			},
+
 			sections = {
-				lualine_x = {
-					diagnostics,
+				lualine_a = {
+					{ mode_label, separator = { left = "" }, padding = { left = 1, right = 1 } },
+				},
+				lualine_b = { branch, diff },
+				lualine_c = {
 					{
-						lazy_status.updates,
-						cond = lazy_status.has_updates,
-						color = { fg = "#ff9e64" },
+						"filename",
+						path = 1,  -- relative path
+						symbols = { modified = "  ", readonly = "  ", unnamed = "  " },
+						color = { fg = colors.fg },
 					},
-					{ "encoding" },
-					{ "fileformat" },
-					{ "filetype" },
+				},
+				lualine_x = {
+					lazy_updates,
+					diagnostics,
+					lsp_name,
+					filetype,
+					encoding,
+					fileformat,
+				},
+				lualine_y = { progress },
+				lualine_z = {
+					location,
+					{
+						function()
+							local bars = { "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█" }
+							local pct  = vim.fn.line(".") / vim.fn.line("$")
+							return bars[math.ceil(pct * #bars)] or bars[1]
+						end,
+						color   = { fg = colors.blue, bg = colors.surface1 },
+						padding = { left = 0, right = 1 },
+					},
 				},
 			},
+
+			inactive_sections = {
+				lualine_a = {},
+				lualine_b = {},
+				lualine_c = {
+					{ "filename", path = 1, color = { fg = colors.overlay } },
+				},
+				lualine_x = { { "filetype", colored = false, color = { fg = colors.overlay } } },
+				lualine_y = {},
+				lualine_z = {},
+			},
+
+			extensions = { "neo-tree", "lazy", "mason", "trouble", "quickfix" },
 		})
 	end,
 }
