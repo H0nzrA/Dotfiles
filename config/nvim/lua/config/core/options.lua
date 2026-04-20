@@ -1,5 +1,6 @@
 vim.cmd("let g:netrw_liststyle = 3")
-vim.g.python3_host_prog = "/usr/bin/python"
+-- vim.g.python3_host_prog = "/usr/bin/python"
+vim.g.python3_host_prog = vim.fn.exepath("python3")
 local opt = vim.opt
 
 opt.number = true

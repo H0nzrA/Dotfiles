@@ -52,6 +52,7 @@ vim.api.nvim_create_autocmd("FileType", {
 		end, vim.tbl_extend("force", opts, { desc = "Toggle checkbox" }))
 	end,
 })
+
 -- Smart format / save (Ctrl+S)
 keymap.set("n", "<C-s>", function()
     local ft = vim.bo.filetype
