@@ -30,13 +30,30 @@ return {
 			end,
 		})
 
-		-- LSP server configuration (modern API)
 		vim.lsp.config("clangd", {
 			capabilities = capabilities,
 		})
 
-		vim.lsp.config("pyright", {
+		vim.lsp.config("basedpyright", {
 			capabilities = capabilities,
+			settings = {
+				basedpyright = {
+					analysis = {
+						typeCheckingMode = "strict",
+
+						reportExplicitAny = false,
+						reportUnknownVariableType = false,
+						reportUnknownMemberType = false,
+						reportUnknownArgumentType = false,
+						reportUnknownParameterType = false,
+						reportUnknownLambdaType = false,
+
+						reportOptionalMemberAccess = false,
+						reportOptionalSubscript = false,
+						reportOptionalCall = false,
+					},
+				},
+			},
 		})
 
 		vim.lsp.config("bashls", {
@@ -58,13 +75,11 @@ return {
 			},
 		})
 
-		-- Enable servers
 		vim.lsp.enable({
 			"clangd",
-			"pyright",
+			"basedpyright",
 			"bashls",
 			"lua_ls",
 		})
 	end,
 }
-

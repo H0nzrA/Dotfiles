@@ -24,7 +24,7 @@ return {
 		mason_lspconfig.setup({
 			ensure_installed = {
 				"clangd",  -- C / C++
-				"pyright", -- Python
+				"basedpyright", -- Python
 				"bashls",  -- Shell
 				"lua_ls",  -- Neovim config
 			},
