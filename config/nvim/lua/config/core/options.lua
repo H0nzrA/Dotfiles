@@ -43,3 +43,10 @@ opt.writebackup = false
 opt.undofile = true
 opt.hidden = true
 
+-- Auto load file modified outside neovim
+opt.autoread = true
+
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  pattern = "*",
+  command = "silent! checktime",
+})
